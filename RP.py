@@ -2,23 +2,32 @@ import psutil
 import os
 import time
 import sys
-import win10toast as w10Notif
+import plyer
 
-TIME_DELAY = 1.5
+TIME_DELAY = 1.0
+prev_upload = int(psutil.net_io_counters(pernic=False)[0])
 
 def start():
+    # This function starts the monitoring process
 
-    # This function starts the monitoring process 
-
-    print("| Memory | CPU | Disk |")
-    while(True):
+    print("| Memory% | CPU%  | CPU(Hz) | Disk% | Upload(kB) | Download(kB) |")
+    prev_upload = int(psutil.net_io_counters(pernic=False)[0]/1024)
+    prev_download = int(psutil.net_io_counters(pernic=False)[1]/1024)
+    while True:
         vMem = psutil.virtual_memory().percent
         cpuUtil = psutil.cpu_percent()
-        cpuFreq = psutil.cpu_freq()
-        os.sep
-        diskUse = psutil.disk_usage(os.sep).percent
+        cpuFreq = psutil.cpu_freq()[1]/1000
+        sep = os.sep
+        new_upload = int(psutil.net_io_counters(pernic=False)[0]/1024)
+        upload = (new_upload - prev_upload)/TIME_DELAY
+        prev_upload = new_upload
+        new_download = int(psutil.net_io_counters(pernic=False)[1]/1024)
+        download = (new_download - prev_download)/TIME_DELAY
+        prev_download = new_download
+        diskUse = psutil.disk_usage(sep).percent
 
-        print("|  {}  | {} | {} |".format(str(vMem), str(cpuUtil), str(diskUse)))
+        print("| {0:>6}% | {1:^4}% | {2:>4}GHz | {3:>4}% | {4:>5}kBps | {5:>5}kBps  |".format(
+            str(vMem), str(cpuUtil), str(cpuFreq), str(diskUse), str(upload), str(download)))
 
         if cpuUtil > 80.0:
             CPUnotif()
@@ -31,64 +40,58 @@ def start():
 
         time.sleep(TIME_DELAY)
         delete_last_line()
-        
+
+
 def CPUnotif():
+    # This function is to send in alert notifications in case of high CPU usage for 10s
+    plyer.notification.notify("ResourcePolice", "CPU Usage high!", timeout=10)
 
-    # This function is to send in alert notifications in case of high CPU usage
-
-    n = w10Notif.ToastNotifier()
-
-    n.show_toast("ResourcePolice", "CPU Usage high!", duration = 10)
 
 def memNotif():
+    # This function is to send in alert notifications in case of high RAM usage for 10s
+    plyer.notification.notify(
+        "ResourcePolice", "Memory Usage high!", timeout=10)
 
-    # This function is to send in alert notifications in case of high CPU usage
-
-    m = w10Notif.ToastNotifier()
-
-    m.show_toast("ResourcePolice", "Memory Usage high!", duration = 10)
 
 def diskNotif():
+    # This function is to send in alert notifications in case of high disk usage for 10s
 
-    # This function is to send in alert notifications in case of high CPU usage
+    plyer.notification.notify("ResourcePolice", "Disk Usage high!", timeout=10)
 
-    o = w10Notif.ToastNotifier()
-
-    o.show_toast("ResourcePolice", "Disk Usage high!", duration = 10)
 
 # LOOKUP = {
 #     'rp.start': start,
 #     'rp.stop': stop,
 #     'rp.quit': quit,
 #     'rp.network': showNetworkResource
-# } # lookup table for user-defined commands 
+# } # lookup table for user-defined commands
+
 
 def stop():
-
     # complete this function to stop monitoring
 
     pass
 
-def quit():
 
+def quit():
     # complete this function to quit ResourcePolice
 
     pass
 
-def showNetworkResource():
 
+def showNetworkResource():
     # complete this function to monitor system network resource
 
     pass
 
-def delete_last_line():
 
+def delete_last_line():
     # This function refreshes resource variables
 
     CURSOR_UP_ONE = '\x1b[1A'
     ERASE_LINE = '\x1b[2K'
     sys.stdout.write(CURSOR_UP_ONE)
-    sys.stdout.write(ERASE_LINE) 
+    sys.stdout.write(ERASE_LINE)
+
 
 start()
-
