@@ -2,7 +2,7 @@ import psutil
 import os
 import time
 import sys
-import plyer
+import win10toast as w10Notif
 
 TIME_DELAY = 1.0
 prev_upload = int(psutil.net_io_counters(pernic=False)[0])
@@ -43,21 +43,28 @@ def start():
 
 
 def CPUnotif():
-    # This function is to send in alert notifications in case of high CPU usage for 10s
-    plyer.notification.notify("ResourcePolice", "CPU Usage high!", timeout=10)
 
+    # This function is to send in alert notifications in case of high CPU usage
+
+    n = w10Notif.ToastNotifier()
+
+    n.show_toast("ResourcePolice", "CPU Usage high!", duration = 10)
 
 def memNotif():
-    # This function is to send in alert notifications in case of high RAM usage for 10s
-    plyer.notification.notify(
-        "ResourcePolice", "Memory Usage high!", timeout=10)
 
+    # This function is to send in alert notifications in case of high CPU usage
+
+    m = w10Notif.ToastNotifier()
+
+    m.show_toast("ResourcePolice", "Memory Usage high!", duration = 10)
 
 def diskNotif():
-    # This function is to send in alert notifications in case of high disk usage for 10s
 
-    plyer.notification.notify("ResourcePolice", "Disk Usage high!", timeout=10)
+    # This function is to send in alert notifications in case of high CPU usage
 
+    o = w10Notif.ToastNotifier()
+
+    o.show_toast("ResourcePolice", "Disk Usage high!", duration = 10)
 
 # LOOKUP = {
 #     'rp.start': start,
@@ -66,26 +73,26 @@ def diskNotif():
 #     'rp.network': showNetworkResource
 # } # lookup table for user-defined commands
 
-
 def stop():
+
     # complete this function to stop monitoring
 
     pass
 
-
 def quit():
+
     # complete this function to quit ResourcePolice
 
     pass
 
-
 def showNetworkResource():
+
     # complete this function to monitor system network resource
 
     pass
 
-
 def delete_last_line():
+
     # This function refreshes resource variables
 
     CURSOR_UP_ONE = '\x1b[1A'
@@ -93,5 +100,5 @@ def delete_last_line():
     sys.stdout.write(CURSOR_UP_ONE)
     sys.stdout.write(ERASE_LINE)
 
-
 start()
+
